@@ -35,6 +35,11 @@ class VendorResource extends Resource
                 ->type('email')
                 ->required(),
 
+                TextInput::make('password')
+                ->label('Password')
+                ->type('password')
+                ->required(),
+
                 TextInput::make('phone')
                 ->label('Nomor Handphone')
                 ->type('number')
@@ -76,7 +81,7 @@ class VendorResource extends Resource
                     return $record->status === 'pending' ? 'yellow' : ($record->status === 'approved' ? 'green' : 'default');
                 })
                 ->formatStateUsing(fn (string $state): string => ucfirst($state)),
-                
+
             ])
             ->filters([
                 //
