@@ -11,14 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendors', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone');
-            $table->string('company_name');
-            $table->string('status')->default('pending');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
             $table->softDeletes();
         });
     }
@@ -28,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendors');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('deleted_at');
+        });
     }
 };
