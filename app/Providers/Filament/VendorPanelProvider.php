@@ -2,13 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Notifications\Notification;
 use Filament\Pages;
-use Filament\Http\Livewire\Auth\Logout;
-use Filament\Panel\Concerns\DefaultUserMenu\LogoutMenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -22,13 +22,27 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class VendorPanelProvider extends PanelProvider
 {
+    public function boot()
+    {
+        Filament::serving(function () {
+            if (session()->has('error')) {
+                Notification::make()
+                    ->title('Access Denied')
+                    ->body(session('error'))
+                    ->danger()
+                    ->send();
+            }
+        });
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
         ->id('vendor')
         ->path('vendor')
-        ->login() // Menambahkan fitur login
-        ->authGuard('vendor') // Pastikan vendor menggunakan guard yang benar
+        ->login()
+        ->brandName('Vendor')
+        ->authGuard('vendor')
         ->colors([
             'primary' => Color::Amber,
         ])

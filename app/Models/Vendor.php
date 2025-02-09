@@ -35,7 +35,8 @@ class Vendor extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function setRememberToken($value) {}
-    public function getRememberToken() {}
-    public function getRememberTokenName() { return null; }
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
 }

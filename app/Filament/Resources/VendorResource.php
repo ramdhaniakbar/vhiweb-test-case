@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VendorResource\Pages;
-use App\Filament\Resources\VendorResource\RelationManagers;
 use App\Models\Vendor;
+use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -12,8 +12,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VendorResource extends Resource
 {
@@ -42,7 +40,7 @@ class VendorResource extends Resource
 
                 TextInput::make('phone')
                 ->label('Nomor Handphone')
-                ->type('number')
+                ->numeric()
                 ->minLength(11)
                 ->maxLength(20)
                 ->required(),
@@ -77,16 +75,29 @@ class VendorResource extends Resource
                 TextColumn::make('status')
                 ->searchable()
                 ->sortable()
-                ->badge(function ($record) {
-                    return $record->status === 'pending' ? 'yellow' : ($record->status === 'approved' ? 'green' : 'default');
-                })
-                ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                ->formatStateUsing(fn ($state) => view('components.badge', ['status' => $state]))
 
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('changeStatus')
+                    ->label('Status')
+                    ->icon('heroicon-m-bars-3-bottom-left')
+                    // ->button()
+                    ->color('primary')
+                    ->visible(fn (Vendor $record) => $record->status === 'pending')
+                    ->action(fn (Vendor $record, array $data) => $record->update(['status' => $data['status']]))
+                    ->form([
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'approved' => 'Approve',
+                                'rejected' => 'Reject',
+                            ])
+                            ->required(),
+                    ])
+                    ->requiresConfirmation(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
