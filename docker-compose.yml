@@ -1,0 +1,35 @@
+version: "3.8"
+
+networks:
+  laravel:
+
+services:
+  app:
+    container_name: procurement_laravel
+    image: image_procurement_laravel
+    build: .
+    ports:
+      - 8001:80
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+
+  db:
+    image: mysql:8
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db-vhiweb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:
